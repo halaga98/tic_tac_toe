@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tic_tac_toe/home/view_model/home_view_model.dart';
-import 'package:tic_tac_toe/home/view_model/state/home_state.dart';
+import 'package:tic_tac_toe/feature/home/view_model/home_view_model.dart';
+import 'package:tic_tac_toe/feature/home/view_model/state/home_state.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   const HomeAppBar({super.key});
