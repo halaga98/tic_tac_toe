@@ -5,6 +5,7 @@ import 'package:tic_tac_toe/feature/home/view/widget/home_app_bar.dart';
 import 'package:tic_tac_toe/feature/home/view/widget/home_user_list.dart';
 import 'package:tic_tac_toe/feature/home/view_model/home_view_model.dart';
 import 'package:tic_tac_toe/feature/home/view_model/state/home_state.dart';
+import 'package:tic_tac_toe/product/navigation/app_router.dart';
 
 import '../model/move.dart';
 import 'mixin/home_view_mixin.dart';
@@ -31,6 +32,7 @@ class _HomeViewState extends BaseState<HomeView> with HomeViewMixin {
           onPressed: () async {
             //productViewModel.changeThemeMode(ThemeMode.dark);
             //   await homeViewModel.fetchUsers();
+            context.router.push(const CreateGameRoute());
           },
         ),
         appBar: const HomeAppBar(),

@@ -8,9 +8,15 @@ final class HomeViewModel extends BaseCubit<HomeState> {
   HomeViewModel({
     required AuthenticationOperation operationService,
   })  : _authenticationOperationService = operationService,
-        super(const HomeState(isLoading: false));
+        super(const HomeState(
+          isLoading: false,
+        ));
 
   final AuthenticationOperation _authenticationOperationService;
+
+  void changeColor(int gridColor) {
+    emit(state.copyWith(gridColor: gridColor));
+  }
 
   /// Change loading state
   void changeLoading() {

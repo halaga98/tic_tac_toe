@@ -41,6 +41,10 @@ dependencies:
 
   # Config
   easy_localization: ^3.0.3
+  #WidgetHelper
+
+  flutter_colorpicker: ^1.0.3
+
   widgets:
     path: module/widgets
 
