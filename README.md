@@ -1,19 +1,11 @@
 # tic_tac_toe
 
-A new Flutter project.
+Feature base MVVM kullanıldı.
+State Managment için bloc kullanıldı.
+Navigation için auto_route kullanıldı.
+easy_localization bağlantısı yapıldı fakat kullanılmadı assetler doldurulması halinde kullanılabiliri.
+Theme configuration yapıldı dilendiği taktirde dark mode arası geçiş yapılabilir.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
 
 Flutter 3.22.3 • channel stable • https://github.com/flutter/flutter.git
 Framework • revision b0850beeb2 (4 weeks ago) • 2024-07-16 21:43:41 -0700
