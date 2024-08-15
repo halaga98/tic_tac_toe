@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tic_tac_toe/feature/home/model/game.dart';
 import 'package:tic_tac_toe/feature/home/view/widget/home_app_bar.dart';
 import 'package:tic_tac_toe/feature/home/view/widget/home_user_list.dart';
 import 'package:tic_tac_toe/feature/home/view_model/home_view_model.dart';
@@ -32,6 +33,7 @@ class _HomeViewState extends BaseState<HomeView> with HomeViewMixin {
           },
         ),
         appBar: const HomeAppBar(),
+        body: _UserBlocList(),
       ),
     );
   }
@@ -44,14 +46,14 @@ final class _UserBlocList extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocListener<HomeViewModel, HomeState>(
       listener: (context, state) {},
-      child: BlocSelector<HomeViewModel, HomeState, List<Object>>(
+      child: BlocSelector<HomeViewModel, HomeState, List<Game>>(
         selector: (state) {
-          return state.users ?? [];
+          return state.games ?? [];
         },
         builder: (context, state) {
           if (state.isEmpty) return const SizedBox.shrink();
 
-          return HomeUserList(users: state);
+          return HomeUserList(games: state);
         },
       ),
     );

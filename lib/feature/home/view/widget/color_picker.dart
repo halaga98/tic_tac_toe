@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:tic_tac_toe/feature/home/view_model/create_game_view_model.dart';
-import 'package:tic_tac_toe/feature/home/view_model/state/create_game_state.dart';
 
 class ColorPickerWidget extends StatefulWidget {
   final Function(Color) onColorSelected;
@@ -16,7 +13,9 @@ class ColorPickerWidget extends StatefulWidget {
 }
 
 class _ColorPickerWidgetState extends State<ColorPickerWidget> {
-  void pickColor(BuildContext context, CreateGameState state) {
+  final ValueNotifier<Color> _colorNotifier = ValueNotifier<Color>(Colors.blue);
+
+  void pickColor(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -24,8 +23,11 @@ class _ColorPickerWidgetState extends State<ColorPickerWidget> {
           title: Text('Pick a color'),
           content: SingleChildScrollView(
             child: ColorPicker(
-              pickerColor: (state.gridColor),
-              onColorChanged: (Color color) => widget.onColorSelected(color),
+              pickerColor: (_colorNotifier.value),
+              onColorChanged: (Color color) {
+                widget.onColorSelected(color);
+                _colorNotifier.value = color;
+              },
               pickerAreaHeightPercent: 0.8, // Renk havuzunu genişletmek için
             ),
           ),
@@ -44,37 +46,16 @@ class _ColorPickerWidgetState extends State<ColorPickerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CreateGameViewModel, CreateGameState>(
-      builder: (context, state) {
-        return Row(
-          children: <Widget>[
-            SizedBox(height: 20),
-            GestureDetector(
-              onTap: () {
-                pickColor(context, state);
-              },
-              child: Container(
-                color: state.gridColor,
-                height: 100,
-                width: 100,
-                child: Center(
-                  child: Text(
-                    'Tap to pick color',
-                    style: TextStyle(
-                        color: const Color.fromARGB(255, 158, 36, 36)),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-            Expanded(
-              child: Text(
-                'Selected Color: ${state.gridColor}',
-                style: TextStyle(fontSize: 16),
-              ),
-            ),
-          ],
+    return ValueListenableBuilder<Color>(
+      valueListenable: _colorNotifier,
+      builder: (BuildContext context, Color value, child) {
+        return ListTile(
+          onTap: () => pickColor(context),
+          title: Text("Grid Color Değiştirmek İçin Tıklayınız"),
+          leading: Icon(
+            Icons.lens,
+            color: value,
+          ),
         );
       },
     );

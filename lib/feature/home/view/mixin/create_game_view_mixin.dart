@@ -4,23 +4,29 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tic_tac_toe/feature/home/model/game.dart';
 import 'package:tic_tac_toe/feature/home/model/move.dart';
 import 'package:tic_tac_toe/feature/home/view/create_game_view.dart';
-import 'package:tic_tac_toe/feature/home/view_model/create_game_view_model.dart';
+import 'package:tic_tac_toe/feature/home/view_model/home_view_model.dart';
 
 import 'package:tic_tac_toe/product/state/base/base_state.dart';
 
-import 'package:flutter/services.dart';
-
 /// Manage your home view business logic
 mixin CreateGameViewMixin on BaseState<CreateGameView> {
-  late final CreateGameViewModel _createGameViewModel;
+  late final HomeViewModel _homeViewModel;
 
-  CreateGameViewModel get createGameViewModel => _createGameViewModel;
-
+  HomeViewModel get homeViewModel => _homeViewModel;
   @override
   void initState() {
-    super.initState();
+    _homeViewModel = HomeViewModel();
 
-    _createGameViewModel = CreateGameViewModel();
+    super.initState();
+  }
+
+  late DocumentReference gameRef;
+
+  //connect game and listen firebase
+  void connectGame(String gameId) {
+    gameRef = FirebaseFirestore.instance.collection('games').doc(gameId);
+    homeViewModel.changeStream(gameRef.snapshots());
+    //_homeViewModel = gameRef.snapshots();
   }
 
 // Create Game Fonction and utils
@@ -28,9 +34,9 @@ mixin CreateGameViewMixin on BaseState<CreateGameView> {
   final formKey = GlobalKey<FormState>();
   final TextEditingController gameNameController = TextEditingController();
   final TextEditingController gridViewCount = TextEditingController();
-
+  Color gridColor = Colors.blue;
   Future<void> createGame() async {
-    if (formKey.currentState!.validate()) {
+    if (!formKey.currentState!.validate()) {
       return;
     }
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -47,9 +53,12 @@ mixin CreateGameViewMixin on BaseState<CreateGameView> {
       board: board,
       turn: playerName,
       status: 'waiting',
-      backgroundColor: createGameViewModel.state.gridColor.value,
+      backgroundColor: gridColor.value,
     );
 
-    FirebaseFirestore.instance.collection('games').add(newGame.toMap());
+    var data = await FirebaseFirestore.instance
+        .collection('games')
+        .add(newGame.toMap());
+    connectGame(data.id);
   }
 }
