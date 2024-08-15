@@ -17,27 +17,63 @@ final class HomeViewModel extends BaseCubit<HomeState> {
     emit(state.copyWith(isLoading: !state.isLoading));
   }
 
-  void changeStream(Stream<DocumentSnapshot> gameStream) {
+  void changeStream(Stream<DocumentSnapshot>? gameStream) {
     emit(state.copyWith(gameStream: gameStream));
   }
 
-  /// Get users
+  /// Get games
   Future<void> getGames() async {
-    final querySnapshot =
-        await FirebaseFirestore.instance.collection("games").get();
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection("games")
+        .where("status", whereIn: ["waiting", "done"])
+        .orderBy("status", descending: true)
+        .get();
 
     final games =
         querySnapshot.docs.map((doc) => Game.fromDocument(doc)).toList();
     emit(state.copyWith(games: games));
   }
 
-  void listenGame() {
-    final docRef = FirebaseFirestore.instance.collection("games");
+  void listenGames() {
+    final docRef = FirebaseFirestore.instance.collection("games").where(
+        "status",
+        whereIn: ["waiting", "done"]).orderBy("status", descending: true);
 
     docRef.snapshots().listen(
       (event) {
         final games = event.docs.map((doc) => Game.fromDocument(doc)).toList();
         emit(state.copyWith(games: games));
+      },
+      onError: (error) => print("Listen failed: $error"),
+    );
+  }
+
+  // game
+  Future<void> getGame(String gameId) async {
+    final documentSnapshot = await FirebaseFirestore.instance
+        .collection("games")
+        .doc(gameId)
+        .get(); // get() kullanarak veriyi çekiyoruz.
+    if (documentSnapshot.exists) {
+      final games = Game.fromDocument(documentSnapshot);
+      emit(state.copyWith(game: games));
+    } else {
+      // Belge bulunamadığında yapılacak işlem
+      print("Game not found");
+    }
+  }
+
+  void listenGame(String gameId) {
+    final docRef = FirebaseFirestore.instance.collection("games").doc(gameId);
+
+    docRef.snapshots().listen(
+      (event) {
+        if (event.exists) {
+          final game = Game.fromDocument(event);
+          emit(state.copyWith(game: game));
+        } else {
+          print("Game not found");
+        }
       },
       onError: (error) => print("Listen failed: $error"),
     );

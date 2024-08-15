@@ -16,9 +16,14 @@ abstract class _$AppRouter extends RootStackRouter {
   @override
   final Map<String, PageFactory> pagesMap = {
     CreateGameRoute.name: (routeData) {
+      final args = routeData.argsAs<CreateGameRouteArgs>(
+          orElse: () => const CreateGameRouteArgs());
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: CreateGameView(),
+        child: CreateGameView(
+          key: args.key,
+          id: args.id,
+        ),
       );
     },
     HomeRoute.name: (routeData) {
@@ -42,16 +47,40 @@ abstract class _$AppRouter extends RootStackRouter {
 
 /// generated route for
 /// [CreateGameView]
-class CreateGameRoute extends PageRouteInfo<void> {
-  const CreateGameRoute({List<PageRouteInfo>? children})
-      : super(
+class CreateGameRoute extends PageRouteInfo<CreateGameRouteArgs> {
+  CreateGameRoute({
+    Key? key,
+    String? id,
+    List<PageRouteInfo>? children,
+  }) : super(
           CreateGameRoute.name,
+          args: CreateGameRouteArgs(
+            key: key,
+            id: id,
+          ),
           initialChildren: children,
         );
 
   static const String name = 'CreateGameRoute';
 
-  static const PageInfo<void> page = PageInfo<void>(name);
+  static const PageInfo<CreateGameRouteArgs> page =
+      PageInfo<CreateGameRouteArgs>(name);
+}
+
+class CreateGameRouteArgs {
+  const CreateGameRouteArgs({
+    this.key,
+    this.id,
+  });
+
+  final Key? key;
+
+  final String? id;
+
+  @override
+  String toString() {
+    return 'CreateGameRouteArgs{key: $key, id: $id}';
+  }
 }
 
 /// generated route for

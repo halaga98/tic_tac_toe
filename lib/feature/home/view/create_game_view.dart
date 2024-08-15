@@ -1,7 +1,8 @@
+import 'dart:math';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tic_tac_toe/feature/home/model/game.dart';
 
@@ -9,13 +10,17 @@ import 'package:tic_tac_toe/feature/home/view/mixin/create_game_view_mixin.dart'
 import 'package:tic_tac_toe/feature/home/view/widget/color_picker.dart';
 import 'package:tic_tac_toe/feature/home/view_model/home_view_model.dart';
 import 'package:tic_tac_toe/feature/home/view_model/state/home_state.dart';
+import 'package:tic_tac_toe/product/navigation/app_router.dart';
 
 import 'package:tic_tac_toe/product/state/base/base_state.dart';
 
 @RoutePage()
 class CreateGameView extends StatefulWidget {
+  const CreateGameView({super.key, this.id});
+
   @override
   _CreateGameViewState createState() => _CreateGameViewState();
+  final String? id;
 }
 
 class _CreateGameViewState extends BaseState<CreateGameView>
@@ -36,14 +41,20 @@ class _CreateGameViewState extends BaseState<CreateGameView>
                 stream: state,
                 builder: (context, snapshot) {
                   var gameData = snapshot.data ?? null;
-                  late Game game;
+                  Game? game;
                   if (gameData != null) {
                     game = Game.fromDocument(gameData);
+                    gameNameController.text = game.name;
+                    int grid = pow(game.board.length, 1 / 2).ceil();
+                    gridViewCount = grid.toString() + "x" + grid.toString();
+                    if (game.status == "started") {
+                      context.router.replace(PlayGameRoute(id: game.id!));
+                    }
                   }
                   return Scaffold(
                     appBar: AppBar(
                       title: Text('Create a New Game'),
-                      actions: [if (gameData != null) Text(game.status)],
+                      actions: [if (game != null) Text(game.status)],
                     ),
                     body: Form(
                       key: formKey,
@@ -53,6 +64,7 @@ class _CreateGameViewState extends BaseState<CreateGameView>
                           children: [
                             TextFormField(
                               controller: gameNameController,
+                              readOnly: game != null,
                               decoration: InputDecoration(
                                 labelText: 'Game Name',
                                 border: OutlineInputBorder(),
@@ -66,34 +78,61 @@ class _CreateGameViewState extends BaseState<CreateGameView>
                             SizedBox(height: 20),
                             ColorPickerWidget(
                               onColorSelected: (Color color) {
+                                if (game != null) return;
                                 gridColor = color;
                               },
                             ),
                             SizedBox(height: 20),
-                            TextFormField(
-                              controller: gridViewCount,
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [
-                                FilteringTextInputFormatter
-                                    .digitsOnly, // Sadece rakamlara izin verir
-                              ],
+                            DropdownButtonFormField<String>(
+                              value: gridViewCount, // Default value
+                              items: ["3x3", "4x4", "5x5"].map((String value) {
+                                return DropdownMenuItem<String>(
+                                  enabled: game == null,
+                                  value: value,
+                                  child: Text(value.toString()),
+                                );
+                              }).toList(),
+                              onChanged: (String? newValue) {
+                                // Handle change
+                                if (newValue != null) {
+                                  gridViewCount = newValue.toString();
+                                }
+                              },
                               decoration: InputDecoration(
-                                labelText: 'Enter a number for grid',
+                                labelText: 'Select a number for grid',
                                 border: OutlineInputBorder(),
                               ),
                               validator: (String? value) {
-                                return (value == null || value.isEmpty)
+                                return (value == null)
                                     ? 'Cannot be empty'
                                     : null;
                               },
                             ),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: ElevatedButton(
-                                onPressed: createGame,
-                                child: Text('Create Game'),
+                            if (game != null)
+                              Column(
+                                children: [
+                                  Text("Participant"),
+                                  Text(game.opponent ?? "Waiting"),
+                                  Text(game.creator),
+                                ],
                               ),
-                            ),
+                            if (widget.id == null)
+                              if (game?.status == "ready")
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: ElevatedButton(
+                                    onPressed: () => startGame(game!.id!),
+                                    child: Text('Start Game'),
+                                  ),
+                                )
+                              else
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: ElevatedButton(
+                                    onPressed: createGame,
+                                    child: Text('Create Game'),
+                                  ),
+                                )
                           ],
                         ),
                       ),

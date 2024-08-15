@@ -10,28 +10,28 @@ class Game {
   String turn;
   String status;
   int backgroundColor;
-
-  Game({
-    this.id,
-    required this.name,
-    required this.creator,
-    required this.board,
-    required this.turn,
-    required this.status,
-    required this.backgroundColor,
-    this.opponent,
-  });
+  String? winner;
+  Game(
+      {this.id,
+      required this.name,
+      required this.creator,
+      required this.board,
+      required this.turn,
+      required this.status,
+      required this.backgroundColor,
+      this.opponent,
+      this.winner});
 
   Map<String, dynamic> toMap() {
     return {
       'name': name,
       'creator': creator,
       'opponent': opponent,
-      //'board': board.map((move) => move.toMap()).toList(),
       'board': this.board.map((v) => v.toJson()).toList(),
       'turn': turn,
       'status': status,
-      'backgroundColor': backgroundColor, // Firebase'de rengi saklamak için
+      'backgroundColor': backgroundColor,
+      'winner': winner
     };
   }
 
@@ -41,14 +41,14 @@ class Game {
         .map((item) => Move.fromJson(item as Map<String, dynamic>))
         .toList();
     return Game(
-      id: doc?.id,
-      name: data['name'],
-      board: moves,
-      turn: data['turn'],
-      creator: data['creator'],
-      opponent: data['opponent'],
-      status: data['status'],
-      backgroundColor: data['backgroundColor'],
-    );
+        id: doc?.id,
+        name: data['name'],
+        board: moves,
+        turn: data['turn'],
+        creator: data['creator'],
+        opponent: data['opponent'],
+        status: data['status'],
+        backgroundColor: data['backgroundColor'],
+        winner: data['winner']);
   }
 }

@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tic_tac_toe/feature/home/view_model/home_view_model.dart';
-import 'package:tic_tac_toe/feature/home/view_model/state/home_state.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   const HomeAppBar({super.key});
@@ -9,9 +6,8 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      actions: const [
-        _Loading(),
-      ],
+      title: _Title(),
+      actions: const [],
     );
   }
 
@@ -20,16 +16,11 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
 }
 
 @immutable
-class _Loading extends StatelessWidget {
-  const _Loading();
+class _Title extends StatelessWidget {
+  const _Title();
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HomeViewModel, HomeState>(
-      builder: (context, state) {
-        if (!state.isLoading) return const SizedBox.shrink();
-        return const CircularProgressIndicator.adaptive();
-      },
-    );
+    return Text("Oyunların Listesi");
   }
 }
